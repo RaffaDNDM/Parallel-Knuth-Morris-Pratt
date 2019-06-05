@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
+#include <limits.h>
 #define SIZE 60
 
 int findKMP(const char *text, const char *pattern, int m, const int *fail);
 void computeFailKMP(char * pattern, int m, int *fail);
+void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype);
 
 int main (int argc, char **argv)
 {
@@ -27,7 +29,7 @@ int main (int argc, char **argv)
 
 
 	//MODIFICA
-	int indez=-1;
+	int index=-1;
 	int *indices = malloc(sizeof(int)*size);
 
 
@@ -65,8 +67,8 @@ int main (int argc, char **argv)
         text[size_text]=0;
 
         //fine verifica
-        printf("\n%s\n", text);
-        printf("size_text %d\n", size_text);
+        //printf("\n%s\n", text);
+        //printf("size_text %d\n", size_text);
 
 
         i=0;
@@ -79,7 +81,7 @@ int main (int argc, char **argv)
         rank_size=(size_text-m+1)/size;
         last_extra=(size_text-m+1)%size;
 
-		printf("%d %d", rank_size, last_extra);
+		//printf("%d %d", rank_size, last_extra);
         int begin_r=-1;
         int begin_w=-1;
         size_cycle2=size*((2*(m-1)))+1;
@@ -113,7 +115,7 @@ int main (int argc, char **argv)
         }
         text2[size_cycle2-1]=0;
 
-        printf("\ntext2: \n%s\n", text2);
+        //printf("\ntext2: \n%s\n", text2);
 
         MPI_Isend(&last_extra, 1, MPI_INT, size-1, 1, MPI_COMM_WORLD, &req);
     }
@@ -129,7 +131,7 @@ int main (int argc, char **argv)
     }
 
     //printf("\nstep 1: %d\n", rank );
-	printf("\nrank: %d size: %d", rank, rcv_size);
+	//printf("\nrank: %d size: %d", rank, rcv_size);
 	char *rcv_buff=malloc(sizeof(char)*(rcv_size+1));
     char *rcv_buff2=malloc(sizeof(char)*((2*m)-1));
     //printf("rank=%d\n",rank);
@@ -137,7 +139,7 @@ int main (int argc, char **argv)
     //passaggio di N/numero_processori elementi a ciascun processore
     MPI_Scatter(text, rank_size, MPI_CHAR, rcv_buff, rank_size, MPI_CHAR, 0, MPI_COMM_WORLD);
 	MPI_Barrier(MPI_COMM_WORLD);
-	printf("\n %ld\n", strlen(rcv_buff));
+	//printf("\n %ld\n", strlen(rcv_buff));
 
     //passaggio del resto di elementi all'ultimo processore
     //(nel caso in cui il numero di caratteri del testo non sia multiplo del numero dei processori)
@@ -151,7 +153,7 @@ int main (int argc, char **argv)
         MPI_Recv(&rcv_buff[rank_size], last_extra, MPI_CHAR, 0, 1, MPI_COMM_WORLD, &stat);
     }
 	rcv_buff[rcv_size] = 0;
-    printf("\n%d %ld %s\n",rank, strlen(rcv_buff) , rcv_buff);
+    //printf("\n%d %ld %s\n",rank, strlen(rcv_buff) , rcv_buff);
 
     //PASSARE FAIL A TUTTI
     MPI_Bcast(fail, m, MPI_INT, 0, MPI_COMM_WORLD);
@@ -162,26 +164,19 @@ int main (int argc, char **argv)
 
 
 	//MODIFICA
-	MPI_Scatter(indeces, 1, MPI_INT, &index, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+	MPI_Scatter(indices, 1, MPI_INT, &index, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
-
-    //--------------Ciclo 1-----------------------
     int partial_result= findKMP(rcv_buff, pattern, m, fail);
     if(partial_result!=-1)
     {
+        //--------------Ciclo 1-----------------------
         partial_result=partial_result+(rank_size*rank);
     }
-
-
-	//MODIFICA
-	//Invece di result_cycle1 e result_cycle2 mettiamo partial_result
-	//poi faccio reduce(&partial_result, &result,...)
-
-    //------------Ciclo 2-------------------------
-    //MODIFICA
 	else
     {
-	    int partial_result= findKMP(rcv_buff2, pattern, m, fail);
+        //------------Ciclo 2-------------------------
+	    partial_result= findKMP(rcv_buff2, pattern, m, fail);
         if(partial_result!=-1)
         {
            // result_cycle2=result_cycle2+(rank_size*rank);//DA CORREGGERE
@@ -192,13 +187,21 @@ int main (int argc, char **argv)
         }
 	}
 
-	int result = -1;
-	MPI_Reduce(&partial_result, &result, 1, MPI_INT, MPI_MIN, 0, MPI_COMM_WORLD);
 
+	int result = -1;
+
+    MPI_Op operation;
+    MPI_Op_create((MPI_User_function *) our_min, 1, &operation);
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("\n%d %d\n", rank, partial_result);
+    MPI_Reduce(&partial_result, &result, 1, MPI_INT, operation, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     if(rank==0)
     {
         printf("\nresult: %d\n",result);
     }
+
+    MPI_Op_free(&operation);
 
     if (rank==0)
     {
@@ -208,6 +211,41 @@ int main (int argc, char **argv)
     getchar();
     MPI_Finalize();
     return 0;
+}
+
+void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype)
+{
+    int flag=1;
+    int i=0;
+    while(i<(*size))
+    {
+        if(invector[i]!=-1)
+        {
+            if(i==0)
+            {
+                *outvalue=invector[i];
+                i=i+1;
+            }
+            if(invector[i]<*outvalue)
+            {
+                printf("\n%d\n",invector[i]);
+                *outvalue=invector[i];
+                i=i+1;
+            }
+        }
+        i=i+1;
+    }
+    printf("\nout %d\n",*outvalue);
+    /**
+    while(i<size)
+    {
+        if(invector[i]!=-1)
+        {
+
+
+        }
+        i=i+1;
+    }*/
 }
 
 int findKMP(const char *text, const char *pattern, int m, const int *fail)
