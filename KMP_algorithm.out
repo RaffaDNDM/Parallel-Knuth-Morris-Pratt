@@ -1,0 +1,9 @@
+\BOOKMARK [0][-]{chapter.1}{Descrizione del Problema}{}% 1
+\BOOKMARK [0][-]{chapter.2}{Descrizione dell'algoritmo}{}% 2
+\BOOKMARK [0][-]{chapter.3}{Analisi della complessit\340 computazionale}{}% 3
+\BOOKMARK [0][-]{chapter.4}{Analisi sperimentale}{}% 4
+\BOOKMARK [1][-]{section.4.1}{Tempi totali d'esecuzione e speed up}{chapter.4}% 5
+\BOOKMARK [1][-]{section.4.2}{Tempi d'esecuzione al variare della taglia dell'input}{chapter.4}% 6
+\BOOKMARK [1][-]{section.4.3}{Impatto delle comunicazioni}{chapter.4}% 7
+\BOOKMARK [1][-]{section.4.4}{Test con parametri di input asimmetrici}{chapter.4}% 8
+\BOOKMARK [0][-]{chapter.5}{Conclusioni}{}% 9
