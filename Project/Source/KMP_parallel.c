@@ -39,7 +39,7 @@ int main (int argc, char **argv)
     fail=malloc(sizeof(int)*m);
 
 
-	//MODIFICA
+	//
 	int index=-1;
 	int *indices = malloc(sizeof(int)*size);
 
@@ -97,7 +97,6 @@ int main (int argc, char **argv)
             int j=0;
             begin_r=((i+1)*rank_size)-m+1;
 
-			//MODIFICA
 			indices[i]=begin_r;
 
 			begin_w=i*2*(m-1);
@@ -106,14 +105,13 @@ int main (int argc, char **argv)
                 text2[begin_w+j]=text[begin_r+j];
             }
         }
+
         begin_r=size_text-(2*(m-1));
-
-		//MODIFICA
 		indices[size-1]=begin_r;
-
 
 		begin_w=i*(2*(m-1));
 		int j=0;
+
         for (; j<2*(m-1); j++)
         {
             text2[begin_w+j]=text[begin_r+j];
@@ -161,7 +159,7 @@ int main (int argc, char **argv)
     MPI_Scatter(text2, 2*(m-1), MPI_CHAR, rcv_buff2, 2*(m-1), MPI_CHAR, 0, MPI_COMM_WORLD);
 
 
-	//MODIFICA
+	//
 	MPI_Scatter(indices, 1, MPI_INT, &index, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -177,7 +175,7 @@ int main (int argc, char **argv)
 	    partial_result= findKMP(rcv_buff2, pattern, m, fail);
         if(partial_result!=-1)
         {
-    		//MODIFICA al suo posto
+    		//
     		partial_result=partial_result+index;
 
         }
