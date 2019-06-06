@@ -219,23 +219,24 @@ void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype)
     int i=0;
     while(i<(*size))
     {
+        int k=0;
+
         if(invector[i]!=-1)
         {
-            if(i==0)
+            if(k==0)
             {
                 *outvalue=invector[i];
-                i=i+1;
             }
             if(invector[i]<*outvalue)
             {
                 printf("\n%d\n",invector[i]);
                 *outvalue=invector[i];
-                i=i+1;
+
             }
+            k=k+1;
         }
         i=i+1;
     }
-    printf("\nout %d\n",*outvalue);
     /**
     while(i<size)
     {
