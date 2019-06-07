@@ -2,49 +2,63 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
-#include <limits.h>
-#ifndef PARALLEL_KMP
-#define PARALLEL_KMP
-#define SIZE 60
-#define LINE "+----------------------------------------------------------+\n"
-#define OUT_SIZE 58
-#define TITLE "\n \
- _____                _ _      _     _  ____  __ _____  \n \
-|  __ \\              | | |    | |   | |/ /  \\/  |  __ \\ \n \
-| |__) |_ _ _ __ __ _| | | ___| |   | ' /| \\  / | |__) |\n \
-|  ___/ _` | '__/ _` | | |/ _ \\ |   |  < | |\\/| |  ___/ \n \
-| |  | (_| | | | (_| | | |  __/ |   | . \\| |  | | |     \n \
-|_|   \\__,_|_|  \\__,_|_|_|\\___|_|   |_|\\_\\_|  |_|_|     \n\n\n"
+#include "KMP.h"
+#include "KMP_parallel.h"
 
-int findKMP(const char *text, const char *pattern, int m, const int *fail);
-void computeFailKMP(char * pattern, int m, int *fail);
+/**
+  @details Operatore MPI che valuta il minimo tra gli indici validi delle occorrenze del pattern
+  @param invector buffer di valori in input
+  @param outvalue puntatore all'indice valido minimo tra quelli in invector
+  @param dtype tipo di dato MPI generico
+*/
 void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype);
+
 
 int main (int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
 
+    //rank di ogni processore e numero di processori
     int rank, size;
+
+    //inizializzazione dei valori precedenti
     MPI_Comm_size(MPI_COMM_WORLD,&size);
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+
+    //dati MPI poi usata per la comunicazione punto a punto successiva
     MPI_Request req;
     MPI_Status stat;
+
+    //inizializzazione del buffer contenente l'intero testo
     int *size_buff;
     int size_text=SIZE;
+
+    //grandezza delle stringhe analizzate da ciscun processore
+    //nel secondo ciclo dell'algoritmo KMP parallelo
     int size_cycle2;
-    int *fail;
+
+    //stringhe che contengono rispettivamente l'intero testo, l'insieme
+    //delle stringhe usate poi nel secondo ciclo e il pattern
     char *text,*text2, *pattern= argv[2];
+    //lunghezza del pattern
     int m = strlen(pattern);
-    int rank_size=0, last_extra=0, rcv_size=0;
+
+    //failure function che verrà calcolata dal processore 0
+    //per tutti gli altri e poi condivisa con loro
+    int *fail;
     fail=malloc(sizeof(int)*m);
 
 
-	//
-	int index=-1;
-	int *indices = malloc(sizeof(int)*size);
+	  //indice del primo carattere della stringa passata
+    //al processore nel secondo ciclo dell'algoritmo
+    int index=-1;
+    //array di tutti gli indici dei primi caratteri di
+    //tutte le stringhe passate ai processori nel secondo ciclo
+    int *indices = malloc(sizeof(int)*size);
 
-
-	/**
+    //variabili utilizzate per definire poi la grandezza del buffer finale
+    int rank_size=0, last_extra=0, rcv_size=0;
+	  /**
     *************************** RANK 0 ********************************
     */
     if (rank==0)
@@ -232,13 +246,6 @@ int main (int argc, char **argv)
     return 0;
 }
 
-/**
-* nostra funzione per il calcolo del minimo indice tra le occorrenze del pattern trovate
-* invector = vettore con valori di input
-* outvalue =indice minimo tra quelli in input
-* size = numero processori
-* dtype=??
-*/
 void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype)
 {
     int flag=1;
@@ -267,72 +274,3 @@ void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype)
         i=i+1;
     }
 }
-
-/**
- * implementazione dell'algortimo KMP
- * text = testo in cui cercare il pattern
- * pattern = stringa da cercare
- * m = lunghezza del pattern
- * fail = array precalcolato fail
-*/
-int findKMP(const char *text, const char *pattern, int m, const int *fail)
-{
-  int n = strlen(text);//lunghezza del testo
-  int j=0; //indice che scandisce il testo
-  int k=0; //indice che scandisce il pattern
-
-  while (j<n)
-  {
-    if(text[j]==pattern[k])
-    {
-      if(k==m-1)// se ho raggiunto la fine del pattern restituisco l'indice di inizio dell'occorrenza
-      {
-        return j-m+1;
-      }
-
-      j=j+1;
-      k=k+1;
-    }
-    else if (k>0) //se non ho corrispondenza ma non sono al primo elemento del pattern
-    {
-      k=fail[k-1];
-    }
-    else //se sono all'inizio del pattern e non ho corrispondenza
-      {
-        j++;
-      }
-  }
-  return -1;//non ha trovato occorrenze
-}
-
-/**
- * funzione che computa l'array fail
- * pattern = stringa da cercare nel testo
- * m = lunghezza del pattern
- * fail = array fail da inizializzare
-*/
-void computeFailKMP(char * pattern, int m, int *fail)
-{
-   int j=1;//indice che scandisce fail
-   int k=0;//indice che scandisce il pattern
-
-   while (j<m)
-   {
-     if (pattern[j]==pattern[k]) //se presente più volte lo stesso carattere all'interno del pattern
-     {
-       fail[j]=k+1;
-       j=j+1;
-       k=k+1;
-     }
-     else if (k>0) //se non sono all'inizio della scansione del pattern e non è un carattere già presente nel pattern
-     {
-       k=fail[k-1];
-     }
-     else // se sono all'inizio della scansione del pattern
-     {
-       j=j+1;
-     }
-   }
-}
-
-#endif
