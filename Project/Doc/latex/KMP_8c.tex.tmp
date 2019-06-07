@@ -1,0 +1,48 @@
+\hypertarget{KMP_8c}{}\section{Source/\+K\+MP.c File Reference}
+\label{KMP_8c}\index{Source/\+K\+M\+P.\+c@{Source/\+K\+M\+P.\+c}}
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}K\+M\+P.\+h\char`\"{}}\newline
+Include dependency graph for K\+M\+P.\+c\+:
+% FIG 0
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{KMP_8c_a06fc8a2f4f86f529ef2743f0b8831bd6}{find\+K\+MP} (const char $\ast$text, const char $\ast$pattern, int m, const int $\ast$fail)
+\item 
+void \hyperlink{KMP_8c_acc9035424611c0e7a4fb431f94b712d2}{compute\+Fail\+K\+MP} (char $\ast$pattern, int m, int $\ast$fail)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{KMP_8c_acc9035424611c0e7a4fb431f94b712d2}\label{KMP_8c_acc9035424611c0e7a4fb431f94b712d2}} 
+\index{K\+M\+P.\+c@{K\+M\+P.\+c}!compute\+Fail\+K\+MP@{compute\+Fail\+K\+MP}}
+\index{compute\+Fail\+K\+MP@{compute\+Fail\+K\+MP}!K\+M\+P.\+c@{K\+M\+P.\+c}}
+\subsubsection{\texorpdfstring{compute\+Fail\+K\+M\+P()}{computeFailKMP()}}
+{\footnotesize\ttfamily void compute\+Fail\+K\+MP (\begin{DoxyParamCaption}\item[{char $\ast$}]{pattern,  }\item[{int}]{m,  }\item[{int $\ast$}]{fail }\end{DoxyParamCaption})}
+
+Funzione che computa l\textquotesingle{}array fail 
+\begin{DoxyParams}{Parameters}
+{\em pattern} & stringa da cercare nel testo \\
+\hline
+{\em m} & lunghezza del pattern \\
+\hline
+{\em fail} & array fail da inizializzare \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{KMP_8c_a06fc8a2f4f86f529ef2743f0b8831bd6}\label{KMP_8c_a06fc8a2f4f86f529ef2743f0b8831bd6}} 
+\index{K\+M\+P.\+c@{K\+M\+P.\+c}!find\+K\+MP@{find\+K\+MP}}
+\index{find\+K\+MP@{find\+K\+MP}!K\+M\+P.\+c@{K\+M\+P.\+c}}
+\subsubsection{\texorpdfstring{find\+K\+M\+P()}{findKMP()}}
+{\footnotesize\ttfamily int find\+K\+MP (\begin{DoxyParamCaption}\item[{const char $\ast$}]{text,  }\item[{const char $\ast$}]{pattern,  }\item[{int}]{m,  }\item[{const int $\ast$}]{fail }\end{DoxyParamCaption})}
+
+Implementazione dell\textquotesingle{}algortimo K\+MP 
+\begin{DoxyParams}{Parameters}
+{\em text} & testo in cui cercare il pattern \\
+\hline
+{\em pattern} & stringa da cercare \\
+\hline
+{\em m} & lunghezza del pattern \\
+\hline
+{\em fail} & array precalcolato fail \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,43 @@
+\hypertarget{KMP__parallel_8c}{}\section{Source/\+K\+M\+P\+\_\+parallel.c File Reference}
+\label{KMP__parallel_8c}\index{Source/\+K\+M\+P\+\_\+parallel.\+c@{Source/\+K\+M\+P\+\_\+parallel.\+c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$mpi.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}K\+M\+P.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}K\+M\+P\+\_\+parallel.\+h\char`\"{}}\newline
+Include dependency graph for K\+M\+P\+\_\+parallel.\+c\+:
+% FIG 0
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{KMP__parallel_8c_affac4bca5d6d7333c8ef819fc6886f47}{our\+\_\+min} (int $\ast$invector, int $\ast$outvalue, int $\ast$size, M\+P\+I\+\_\+\+Datatype $\ast$dtype)
+\item 
+int \hyperlink{KMP__parallel_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main} (int argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{KMP__parallel_8c_a3c04138a5bfe5d72780bb7e82a18e627}\label{KMP__parallel_8c_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{K\+M\+P\+\_\+parallel.\+c@{K\+M\+P\+\_\+parallel.\+c}!main@{main}}
+\index{main@{main}!K\+M\+P\+\_\+parallel.\+c@{K\+M\+P\+\_\+parallel.\+c}}
+\subsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+R\+A\+NK 0 $\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$
+
+F\+I\+NE R\+A\+NK 0 $\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$\mbox{\Hypertarget{KMP__parallel_8c_affac4bca5d6d7333c8ef819fc6886f47}\label{KMP__parallel_8c_affac4bca5d6d7333c8ef819fc6886f47}} 
+\index{K\+M\+P\+\_\+parallel.\+c@{K\+M\+P\+\_\+parallel.\+c}!our\+\_\+min@{our\+\_\+min}}
+\index{our\+\_\+min@{our\+\_\+min}!K\+M\+P\+\_\+parallel.\+c@{K\+M\+P\+\_\+parallel.\+c}}
+\subsubsection{\texorpdfstring{our\+\_\+min()}{our\_min()}}
+{\footnotesize\ttfamily void our\+\_\+min (\begin{DoxyParamCaption}\item[{int $\ast$}]{invector,  }\item[{int $\ast$}]{outvalue,  }\item[{int $\ast$}]{size,  }\item[{M\+P\+I\+\_\+\+Datatype $\ast$}]{dtype }\end{DoxyParamCaption})}
+
+Operatore M\+PI che valuta il minimo tra gli indici validi delle occorrenze del pattern 
+\begin{DoxyParams}{Parameters}
+{\em invector} & buffer di valori in input \\
+\hline
+{\em outvalue} & puntatore all\textquotesingle{}indice valido minimo tra quelli in invector \\
+\hline
+{\em dtype} & tipo di dato M\+PI generico \\
+\hline
+\end{DoxyParams}
