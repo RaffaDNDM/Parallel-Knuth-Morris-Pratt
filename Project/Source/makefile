@@ -6,6 +6,6 @@ KMP_parallel : KMP_parallel.o KMP.o
 KMP_parallel.o: KMP_parallel.c
 	mpicc -c KMP_parallel.c
 
-#Compilazione dell'algoritmo classico
+# Compilazione dell'algoritmo classico
 KMP.o: KMP.c
 	mpicc -c KMP.c
