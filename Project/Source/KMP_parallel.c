@@ -1,5 +1,6 @@
 /**
-  @file KMP_parallel.c
+  @file KMP_parallel.cù
+  @brief Classe con ilmain e la computazione di KMP in parallelo
   @author Di Nardo Di Maio Raffaele 1204879
   @author Fabris Cristina 1205722
 */
@@ -15,6 +16,7 @@
   @details Operatore MPI che valuta il minimo tra gli indici validi delle occorrenze del pattern
   @param invector buffer di valori in input
   @param outvalue puntatore all'indice valido minimo tra quelli in invector
+  @param size grandezza del buffer di input (grandezza del comunicatore poi nel Reduce)
   @param dtype tipo di dato MPI generico
 */
 void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype);
@@ -64,9 +66,8 @@ int main (int argc, char **argv)
 
     //variabili utilizzate per definire poi la grandezza del buffer finale
     int rank_size=0, last_extra=0, rcv_size=0;
-	  /**
-    *************************** RANK 0 ********************************
-    */
+
+    //*************************** RANK 0 ********************************
     if (rank==0)
     {
         printf(TITLE);
@@ -146,9 +147,6 @@ int main (int argc, char **argv)
         //invio dei caratteri da aggiungere a quelli da analizzare all'ultimo processo
         MPI_Isend(&last_extra, 1, MPI_INT, size-1, 1, MPI_COMM_WORLD, &req);
     }
-    /**
-    ***********************FINE RANK 0 ********************************
-    */
 
     //invio della dimensione del buffer da allocare in ogni processo per ricevere il testo da analizzare
     MPI_Bcast(&rank_size, 1, MPI_INT, 0, MPI_COMM_WORLD);

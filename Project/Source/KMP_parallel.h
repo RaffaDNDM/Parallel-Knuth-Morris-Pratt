@@ -1,5 +1,7 @@
 /**
   @file KMP_parallel.h
+  @brief Definizione di macro utili per l'elaborazione dell'input
+  @brief e dell'output in Parallel KMP
   @author Di Nardo Di Maio Raffaele 1204879
   @author Fabris Cristina 1205722
 */

@@ -1,5 +1,6 @@
 /**
   @file KMP.h
+  @brief Definizione delle funzioni necessarie a KMP
   @author Di Nardo Di Maio Raffaele 1204879
   @author Fabris Cristina 1205722
 */
