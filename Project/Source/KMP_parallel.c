@@ -1,3 +1,9 @@
+/**
+  @file KMP_parallel.c
+  @author Di Nardo Di Maio Raffaele 1204879
+  @author Fabris Cristina 1205722
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

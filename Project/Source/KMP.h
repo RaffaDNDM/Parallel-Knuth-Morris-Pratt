@@ -1,3 +1,9 @@
+/**
+  @file KMP.h
+  @author Di Nardo Di Maio Raffaele 1204879
+  @author Fabris Cristina 1205722
+*/
+
 #ifndef KMP
 
 #define KMP

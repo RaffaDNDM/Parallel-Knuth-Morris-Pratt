@@ -1,3 +1,9 @@
+/**
+  @file KMP.c
+  @author Di Nardo Di Maio Raffaele 1204879
+  @author Fabris Cristina 1205722
+*/
+
 #include <string.h>
 #include "KMP.h"
 
