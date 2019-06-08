@@ -9,3 +9,6 @@ KMP_parallel.o: KMP_parallel.c
 # Compilazione dell'algoritmo classico
 KMP.o: KMP.c
 	mpicc -c KMP.c
+
+clean:
+	rm -f *.o

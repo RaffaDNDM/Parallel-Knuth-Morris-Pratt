@@ -1,6 +1,6 @@
 /**
-  @file KMP_parallel.cù
-  @brief Classe con ilmain e la computazione di KMP in parallelo
+  @file KMP_parallel.c
+  @brief Classe con il main e la computazione di KMP in parallelo
   @author Di Nardo Di Maio Raffaele 1204879
   @author Fabris Cristina 1205722
 */
@@ -57,7 +57,7 @@ int main (int argc, char **argv)
     fail=malloc(sizeof(int)*m);
 
 
-	  //indice del primo carattere della stringa passata
+	//indice del primo carattere della stringa passata
     //al processore nel secondo ciclo dell'algoritmo
     int index=-1;
     //array di tutti gli indici dei primi caratteri di
@@ -100,6 +100,10 @@ int main (int argc, char **argv)
         text=realloc(text, sizeof(char)*(size_text+1));
         text[size_text]=0;
 
+        //Chiusura del file aperto in Lettura
+        fclose(fp);
+
+
         //allocazione dello spazio per l'array fail e sua computazione, m=lunghezza del pattern
         i=0;
         for(;i<m;i++)
@@ -121,7 +125,7 @@ int main (int argc, char **argv)
             int j=0;
             begin_r=((i+1)*rank_size)-m+1;
 
-			indices[i]=begin_r;//memorizzazione degli indici del primo carattere passato successivamente ai processori per il secondo ciclo
+            indices[i]=begin_r;//memorizzazione degli indici del primo carattere passato successivamente ai processori per il secondo ciclo
 
             //acquisizione del testo necessario per il secondo ciclo
 			begin_w=i*2*(m-1);
@@ -168,6 +172,7 @@ int main (int argc, char **argv)
     MPI_Scatter(text, rank_size, MPI_CHAR, rcv_buff, rank_size, MPI_CHAR, 0, MPI_COMM_WORLD);
 	MPI_Barrier(MPI_COMM_WORLD);
 
+
     //passaggio del resto di caratteri all'ultimo processore (last_extra)
     //(nel caso in cui il numero di caratteri del testo non sia multiplo del numero dei processori)
     if(rank==0)
@@ -179,7 +184,7 @@ int main (int argc, char **argv)
     {
         MPI_Recv(&rcv_buff[rank_size], last_extra, MPI_CHAR, 0, 1, MPI_COMM_WORLD, &stat);
     }
-	rcv_buff[rcv_size] = 0;
+	  rcv_buff[rcv_size] = 0;
 
     //passaggio dell'array fail a tutti i processi
     MPI_Bcast(fail, m, MPI_INT, 0, MPI_COMM_WORLD);
@@ -199,21 +204,20 @@ int main (int argc, char **argv)
     int partial_result= findKMP(rcv_buff, pattern, m, fail);
     if(partial_result!=-1)
     {
-        //--------------Ciclo 1-----------------------
+        //--------------Ciclo 1------------------------
         partial_result=partial_result+(rank_size*rank);//calcolo dell'indice assoluto
     }
-	else
+	  else
     {
-        //------------Ciclo 2-------------------------
-	    partial_result= findKMP(rcv_buff2, pattern, m, fail);
+        //--------------Ciclo 2------------------------
+	      partial_result= findKMP(rcv_buff2, pattern, m, fail);
         if(partial_result!=-1)
         {
-    		partial_result=partial_result+index;//calcolo dell'indice assoluto
+    		    partial_result=partial_result+index;//calcolo dell'indice assoluto
         }
-	}
+	  }
 
-
-	int result = -1;
+	  int result = -1;
 
     //creazione della nostra funzione per il calcolo dell'indice minimo tra le occorenze trovate
     MPI_Op operation;
@@ -238,14 +242,23 @@ int main (int argc, char **argv)
         printf(LINE);
     }
 
+    //Deallocazione della memoria
     MPI_Op_free(&operation);
+
+    free(indices);
+    free(rcv_buff);
+    free(rcv_buff2);
+    free(fail);
 
     if (rank==0)
     {
+        free(text2);
         free(text);
-        free(fail);
-    }
-    getchar();
+		//Chiusura dell'applicazione
+		printf("Premere un tasto qualsiasi per uscire\n");
+		getchar();
+	}
+
     MPI_Finalize();
     return 0;
 }
@@ -261,13 +274,13 @@ void our_min(int *invector, int *outvalue, int *size, MPI_Datatype *dtype)
         if(invector[i]!=-1)
         {
             // se primo indice valido che trovo inizializzo il valore di output
-            // (indice minore poichè valori passati in input già ordinati dal più
-            //  piccolo al più grande per costruzione)
             if(k==0)
             {
                 *outvalue=invector[i];
             }
-            //SIAMO SICURI CHE QUESTO IF SERVA?
+            //altrimenti cerco il minimo devo scandirli perchè l'ordine in invector
+            //dipende dall'arrivo dei messaggi nel buffer
+            //potrebbe non rispettare l'ordine crescente del rank dei processi
             if(invector[i]<*outvalue)
             {
                 *outvalue=invector[i];
