@@ -1,1 +1,49 @@
 \chapter{Descrizione dell'algoritmo}
+L'algortimo utilizzato divide il testo in sezione e ne assegna una ad ogni processore disponibile. Questi eseguono parallelamente una ricerca del pattern voluto con l'algoritmo KMP e restituiscono l'indice della prima occorrenza trovata. Infine, uno dei processi verifica qual è l'indice complessivo minore e lo restituisce all'utente.
+\section{Algoritmo Knuth Morris Pratt}
+L'algoritmo KMP esegue pattern-matching in tempo lineare nella dimensione del testo in cui cercare il pattern. Infatti, sfrutta i risultati ottenuti precedentemente per evitare di dover rifare confronti su elementi già analizzati. Per fare questo esegue una fase di preprocessamento del pattern prima della ricerca vera e propria. Questa viene sfruttata nel caso in cui si verifichi un confronto con esito negativo (mismatch) dopo una serie di successi (match).\\
+In pratica, considerando una sottostringa del pattern, lo si analizza alla ricerca del maggior prefisso che costituisce anche suffisso della stessa. Con il termine {\itshape prefisso} si intendono i primi {\itshape n} caratteri che compongono una stringa, mentre con {\itshape suffisso} gli ultimi {\itshape n}. Tale funzione restituisce un vettore della stessa lunghezza del pattern, contenete, per ogni indice {\itshape j}, la lunghezza del maggior prefisso che rispetti la proprietà descritta, relativamente alla sottostringa che va dall'inizio del pattern al suo j-esimo elemento. In questo modo, nel caso in cui si verifichi un mismatch tra testo e pattern, si potrà sapere di quando traslare quest'ultimo rispetto al testo accedendo ai valori salvati nel vettore.\\
+
+(INSERIRE IMMAGINE CON ESEMPIO DI COMPUTAZIONE DI FAIL)\\
+
+Una volta terminata la computazione del vettore, l'algoritmo passa ad eseguire il pattern matching. Confronta gli elementi del testo con quelli che formano il pattern cercato e, nel caso in cui si verifichi un mismatch tra l'elemento i del testo e il j-esimo del pattern, riprende la ricerca confrontando l'elemento t-esimo del testo con l'elemento k-esimo del pattern. Gli indici t e k  vengono calcolati con la seguente regola: (MODIFICARE IN UNA FORMA PIÙ CARINA)\\
+- se j!=0: k = valore contenuto nella posizione j-1 del vettore precalcolato e t =i\\
+- se j=0: k=0 e t = i+1\\
+Una volta che i confronti raggiungono con successo la fine del pattern viene restituito l'indice iniziale dell'occorenza appena trovata.\\ \\
+ 
+(INSERIRE RIFERIMENTO ALL'INDIRIZZO WEB\\ https://www.studocu.com/it/document/universita-degli-studi-di-napoli-parthenope/programmazione-ii-e-laboratorio-di-programmazione-ii-cfu-9/appunti/16-algoritmo-kmp-per-lo-string-matching/1519440/view)
+
+
+\section{Parallelizzazione}
+Sfruttando più processori è possibile effettuare la ricerca del pattern in più parti del testo contemporaneamente.\\
+Per prima cosa viene scelto un processore che si occupi di computare tutte le informazioni necessarie per l'esecuzione dell'algoritmo KMP. Nel nostro caso questo processore è lo zeresimo (ESISTE COME PAROLA?). \\
+Questo acquisisce il file in cui effettuare la ricerca ed esegue il preprocessamento del pattern (SI CAPISCE COSA INTENDO? FAIL). Poi divide il file in un numero di sezioni pari al numero di processi disponibili, con l'accortezza di  non considerare gli ultimi {\itshape m-1} elementi (con {\itshape m} = lunghezza del pattern). Nel caso in cui il numero di elementi rimanenti non sia divisibile per il numero di processi, aggiunge quelli restanti all'ultima sezione. Una volta effettuati questi procedimenti, comunica a tutti i processi la loro sezione di testo che da analizzare e il vettore di indici precomputato. \\
+In questo modo però, nel caso in cui siano presenti occorrenze del pattern a cavallo tra due sezioni del testo, non vengono trovate. Per evitare ciò, ogni processo effettua una seconda ricerca, sempre attraverso l'utilizzo dell'algortimo KMP, su una nuova sezione del testo inviatagli dal processo 0. Questa è formata dagli ultimi {\itshape m-1} elementi di una sezione e dai primi {\itshape m-1} di quella successiva. L'ultimo processo, invece, analizza gli ultimi {\itshape m-1} elementi dell'ultima sezione e gli {\itshape m-1} che erano stati precedentemente esclusi dalla suddivisione del testo. In questo modo tutti i processi si ritrovano a dover lavorare anche durante il secondo ciclo, cosa che invece non si sarebbe verificata se il file fosse stato interamente diviso all'inizio.\\
+Una volta che tutti i processi hanno terminato la ricerca, il processo 0 verifica qual è l'indice minore tra quelli restituiti. Questo è l'indice corrispondente della prima occorenza del pattern all'interno del testo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
