@@ -1,49 +1,70 @@
 \chapter{Descrizione dell'algoritmo}
-L'algortimo utilizzato divide il testo in sezione e ne assegna una ad ogni processore disponibile. Questi eseguono parallelamente una ricerca del pattern voluto con l'algoritmo KMP e restituiscono l'indice della prima occorrenza trovata. Infine, uno dei processi verifica qual è l'indice complessivo minore e lo restituisce all'utente.
-\section{Algoritmo Knuth Morris Pratt}
-L'algoritmo KMP esegue pattern-matching in tempo lineare nella dimensione del testo in cui cercare il pattern. Infatti, sfrutta i risultati ottenuti precedentemente per evitare di dover rifare confronti su elementi già analizzati. Per fare questo esegue una fase di preprocessamento del pattern prima della ricerca vera e propria. Questa viene sfruttata nel caso in cui si verifichi un confronto con esito negativo (mismatch) dopo una serie di successi (match).\\
-In pratica, considerando una sottostringa del pattern, lo si analizza alla ricerca del maggior prefisso che costituisce anche suffisso della stessa. Con il termine {\itshape prefisso} si intendono i primi {\itshape n} caratteri che compongono una stringa, mentre con {\itshape suffisso} gli ultimi {\itshape n}. Tale funzione restituisce un vettore della stessa lunghezza del pattern, contenete, per ogni indice {\itshape j}, la lunghezza del maggior prefisso che rispetti la proprietà descritta, relativamente alla sottostringa che va dall'inizio del pattern al suo j-esimo elemento. In questo modo, nel caso in cui si verifichi un mismatch tra testo e pattern, si potrà sapere di quando traslare quest'ultimo rispetto al testo accedendo ai valori salvati nel vettore.\\
+Il procedimento di pattern-matching sequenziale naive non sfrutta la possibile presenza di una serie di confronti con esito positivo (match), verificatasi prima di un esito negativo (mismatch) \footnote{esito positivo = corrispondenza di un carattere nel testo e un carattere nel pattern}.\\ Una conseguenza di tale approccio è la dipendenza del tempo di computazione sia dalla grandezza del testo($n$) che da quella del pattern alfanumerico ($m$), rendendo nel caso peggiore le prestazioni quadratiche rispetto ad $n$. Il numero di confronti effettuati, infatti, corrisponde a $\Theta ((n-m+1)m)$.\\
+L'algoritmo utilizzato divide il testo in sezioni e ne assegna una ad ogni processore disponibile. Ognuno di questi, in parallelo rispetto agli altri, esegue una ricerca del pattern voluto con l'algoritmo KMP e restituisce l'indice della prima occorrenza trovata. Nel caso in cui il pattern sia presente all'interno del testo, verrà restituito l'indice minore tra quelli individuati dai processi; altrimenti ne verrà notificata l'assenza all'utente.
+\section{Algoritmo Knuth Morris Pratt}\label{KMP}
+L'algoritmo KMP esegue pattern-matching in tempo lineare rispetto alla sola dimensione del testo. 
+Sfrutta i risultati ottenuti in precedenza per evitare di dover effettuare nuovamente confronti su caratteri già analizzati. Per rispettare queste prestazioni viene eseguita inizialmente una fase di pre-processamento del pattern, utilizzata per evitare di dover compiere maggiori confronti come nel procedimento naive\cite{func}.\\ Per comprendere in che modo venga effettuata questa fase, è conveniente introdurre i concetti di prefisso e suffisso di una stringa.
+Con il termine {\itshape prefisso} di lunghezza $k$  di una stringa si intendono i primi $k$ caratteri che la compongono, mentre con {\itshape suffisso} di lunghezza $k$ gli ultimi $k$.
+Per ogni prefisso del pattern, viene ricercato il suo prefisso di lunghezza maggiore, che ne costituisca anche un suffisso. Il pre-processamento restituisce un vettore di numeri interi della stessa lunghezza del pattern, chiamato vettore di fallimento o fail vector. Questo contiene, in ogni cella di indice $j$, la lunghezza del prefisso ricercato, come specificato in precedenza, nella sottostringa del pattern (che si estende dal primo carattere al $j$-esimo) (Figura \ref{Esempio_fail}). In questo modo, accedendo ai valori salvati nel vettore, nel caso in cui si verifichi un mismatch, si potrà sapere quali caratteri confrontare successivamente all'interno del testo e del pattern.\\
+\begin{comment}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5, angle=0]{Path}
+\caption{\footnotesize{}}
+\label{Esempio_fail}
+\end{figure}
+\end{comment}
+Una volta terminata la computazione del vettore, l'algoritmo inizia a confrontare gli elementi del testo con quelli che formano il pattern cercato. Nel caso in cui si verifichi un mismatch tra l'elemento $i$-esimo del testo e il $j$-esimo del pattern, il successivo confronto avviene tra l'elemento $t$-esimo del testo e l'elemento $k$-esimo del pattern. Gli indici $t$ e $k$  vengono calcolati con la seguente regola: 
+$$
+\bigg\{
+\begin{array}{llcl}
+{k=fail\_vector[j-1]} & {t=i} & {\:\:\:\:} & {se\:j\ne 0} \\
+{k=0} & {t=i+1} & {\:\:\:\:} & {se\:j = 0} \\
+\end{array}
+$$
+Una volta che i confronti hanno esito positivo per ogni carattere del pattern viene restituito l'indice iniziale dell'occorrenza del pattern nel testo.\\ \\
 
-(INSERIRE IMMAGINE CON ESEMPIO DI COMPUTAZIONE DI FAIL)\\
+\section{Parallelizzazione}\label{Parallel}
+Sfruttando più processori è possibile effettuare la ricerca del pattern in più porzioni del testo contemporaneamente. In fase di esecuzione, il programma riceve in input da linea di comando il nome del file contenente il testo e il pattern da cercare. \\ Per prima cosa viene selezionato un processore che funga da "master" e si occupi di elaborare tutte le informazioni necessarie per l'esecuzione dell'algoritmo KMP. Nel nostro caso questo processore "privilegiato" è quello di rank 0 e i suoi compiti principali sono:
+\begin{enumerate}
 
-Una volta terminata la computazione del vettore, l'algoritmo passa ad eseguire il pattern matching. Confronta gli elementi del testo con quelli che formano il pattern cercato e, nel caso in cui si verifichi un mismatch tra l'elemento i del testo e il j-esimo del pattern, riprende la ricerca confrontando l'elemento t-esimo del testo con l'elemento k-esimo del pattern. Gli indici t e k  vengono calcolati con la seguente regola: (MODIFICARE IN UNA FORMA PIÙ CARINA)\\
-- se j!=0: k = valore contenuto nella posizione j-1 del vettore precalcolato e t =i\\
-- se j=0: k=0 e t = i+1\\
-Una volta che i confronti raggiungono con successo la fine del pattern viene restituito l'indice iniziale dell'occorenza appena trovata.\\ \\
- 
-(INSERIRE RIFERIMENTO ALL'INDIRIZZO WEB\\ https://www.studocu.com/it/document/universita-degli-studi-di-napoli-parthenope/programmazione-ii-e-laboratorio-di-programmazione-ii-cfu-9/appunti/16-algoritmo-kmp-per-lo-string-matching/1519440/view)
+\item{\textbf{Pre-processamento del pattern}\\
+Calcola il fail vector applicando al pattern di partenza la funzione di fallimento
+}
+\item{\textbf{Elaborazione del testo}
+Legge in input il nome del file in cui cercare il pattern e si occupa di aprire lo stream verso di esso. Legge il contenuto del testo ed in seguito chiude lo stream verso di esso.
+\begin{itemize}
+\item{\textbf{Ciclo 1}\\
+Una volta salvato l'intero testo all'interno di una stringa, rimuove $m-1$ elementi da essa ( $m$ = lunghezza del pattern) e la divide in un numero di sezioni pari al numero di processi disponibili.\\Se la stringa risultante dalla rimozione degli ultimi caratteri non dovesse essere un multiplo del numero di processori utilizzati, viene svolta una ripartizione intera della stringa e gli elementi non inclusi vengono inviati al processore di $rank=numero_processori-1$. La cosa più importante è che le stringhe debbano essere inviate rispettando l'ordine crescente dei rank e associandole in questo modo ai vari processori.
+\begin{comment}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5, angle=0]{Path}
+\caption{\footnotesize{}}
+\label{Esempio_Ciclo1}
+\end{figure}
+\end{comment}
 
+}
+\item{\textbf{Ciclo 2}\\
+Nel caso in cui siano presenti occorrenze del pattern a cavallo tra due sezioni del testo, calcolate nel \textbf{Ciclo 1}, non verranno rilevate. Per risolvere tale problema, il processore $0$, elabora anche le sottostringhe necessarie a ciascun processore per verificare la presenza di possibili occorrenze in quelle zone.\\Le sequenze elaborate in questa fase sono costituite dagli ultimi $m-1$ caratteri di una sezione del \textbf{Ciclo 1} e i successivi $m-1$ caratteri. Da questa elaborazione del testo, si può evincere la nostra scelta di escludere alcuni caratteri nel primo ciclo.
+\begin{comment}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5, angle=0]{Path}
+\caption{\footnotesize{}}
+\label{Esempio_Ciclo2}
+\end{figure}
+\end{comment}
+}
+\end{itemize}
+}
+\item{\textbf{Distribuzione dei dati}
+Distribuisce a ogni processore le sottostringhe elaborate nel \textbf{Ciclo 1} e nel \textbf{Ciclo 2} ed il fail vector calcolato nella prima fase. Inoltre invia ad ogni processore il valore intero necessario per stabilire quale sia l'indice di un'eventuale occorrenza nelle stringhe del Ciclo 2, all'interno del testo originario. 
+}
+\item{\textbf{Gestione dell'output}
+Verifica quale sia l'indice minore tra quelli restituiti da ogni processore e mostra sullo standard output. Nel caso in cui non sia stato trovato il pattern, notifica ciò all'utente.
+}
+\end{enumerate}
 
-\section{Parallelizzazione}
-Sfruttando più processori è possibile effettuare la ricerca del pattern in più parti del testo contemporaneamente.\\
-Per prima cosa viene scelto un processore che si occupi di computare tutte le informazioni necessarie per l'esecuzione dell'algoritmo KMP. Nel nostro caso questo processore è lo zeresimo (ESISTE COME PAROLA?). \\
-Questo acquisisce il file in cui effettuare la ricerca ed esegue il preprocessamento del pattern (SI CAPISCE COSA INTENDO? FAIL). Poi divide il file in un numero di sezioni pari al numero di processi disponibili, con l'accortezza di  non considerare gli ultimi {\itshape m-1} elementi (con {\itshape m} = lunghezza del pattern). Nel caso in cui il numero di elementi rimanenti non sia divisibile per il numero di processi, aggiunge quelli restanti all'ultima sezione. Una volta effettuati questi procedimenti, comunica a tutti i processi la loro sezione di testo che da analizzare e il vettore di indici precomputato. \\
-In questo modo però, nel caso in cui siano presenti occorrenze del pattern a cavallo tra due sezioni del testo, non vengono trovate. Per evitare ciò, ogni processo effettua una seconda ricerca, sempre attraverso l'utilizzo dell'algortimo KMP, su una nuova sezione del testo inviatagli dal processo 0. Questa è formata dagli ultimi {\itshape m-1} elementi di una sezione e dai primi {\itshape m-1} di quella successiva. L'ultimo processo, invece, analizza gli ultimi {\itshape m-1} elementi dell'ultima sezione e gli {\itshape m-1} che erano stati precedentemente esclusi dalla suddivisione del testo. In questo modo tutti i processi si ritrovano a dover lavorare anche durante il secondo ciclo, cosa che invece non si sarebbe verificata se il file fosse stato interamente diviso all'inizio.\\
-Una volta che tutti i processi hanno terminato la ricerca, il processo 0 verifica qual è l'indice minore tra quelli restituiti. Questo è l'indice corrispondente della prima occorenza del pattern all'interno del testo.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Tutti i processi, compreso il "master", in seguito alla distribuzione dei dati da parte del processore di rank 0, applicano l'algoritmo KMP sulle stringhe del Ciclo 1. Nel caso in cui non trovassero un'occorrenza, eseguono la stessa ricerca sulla stringhe del Ciclo 2. I risultati vengono poi inviati verso il "master" che effettuerà la gestione dell'output.

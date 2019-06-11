@@ -4,10 +4,10 @@
 \contentsline {chapter}{\numberline {2}Descrizione dell'algoritmo}{3}{chapter.2}
 \contentsline {section}{\numberline {2.1}Algoritmo Knuth Morris Pratt}{3}{section.2.1}
 \contentsline {section}{\numberline {2.2}Parallelizzazione}{4}{section.2.2}
-\contentsline {chapter}{\numberline {3}Analisi della complessit\IeC {\`a} computazionale}{5}{chapter.3}
-\contentsline {chapter}{\numberline {4}Analisi sperimentale}{6}{chapter.4}
-\contentsline {section}{\numberline {4.1}Tempi totali d'esecuzione e speed up}{6}{section.4.1}
-\contentsline {section}{\numberline {4.2}Tempi d'esecuzione al variare della taglia dell'input}{6}{section.4.2}
-\contentsline {section}{\numberline {4.3}Impatto delle comunicazioni}{6}{section.4.3}
-\contentsline {section}{\numberline {4.4}Test con parametri di input asimmetrici}{6}{section.4.4}
-\contentsline {chapter}{\numberline {5}Conclusioni}{7}{chapter.5}
+\contentsline {chapter}{\numberline {3}Analisi della complessit\IeC {\`a} computazionale}{6}{chapter.3}
+\contentsline {chapter}{\numberline {4}Analisi sperimentale}{7}{chapter.4}
+\contentsline {section}{\numberline {4.1}Tempi totali d'esecuzione e speed up}{7}{section.4.1}
+\contentsline {section}{\numberline {4.2}Tempi d'esecuzione al variare della taglia dell'input}{7}{section.4.2}
+\contentsline {section}{\numberline {4.3}Impatto delle comunicazioni}{7}{section.4.3}
+\contentsline {section}{\numberline {4.4}Test con parametri di input asimmetrici}{7}{section.4.4}
+\contentsline {chapter}{\numberline {5}Conclusioni}{8}{chapter.5}
