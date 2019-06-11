@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.11.28)  11 JUN 2019 15:55
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.11.28)  11 JUN 2019 23:39
 entering extended mode
 **./KMP_algorithm.tex
 (KMP_algorithm.tex
@@ -979,32 +979,51 @@ Underfull \hbox (badness 10000) in paragraph at lines 2--1
 
 ] [2]
  2.
-
-LaTeX Warning: Reference `Esempio_fail' on page 3 undefined on input line 8.
-
+<./Images/Chapters/Esempio_Fail.png, id=102, 556.32843pt x 478.03593pt>
+File: ./Images/Chapters/Esempio_Fail.png Graphic file (type png)
+<use ./Images/Chapters/Esempio_Fail.png>
+Package pdftex.def Info: ./Images/Chapters/Esempio_Fail.png  used on input line
+ 11.
+(pdftex.def)             Requested size: 333.79964pt x 286.82376pt.
 [3
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 24--26
+Underfull \hbox (badness 10000) in paragraph at lines 22--24
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 24--26
+Underfull \hbox (badness 10000) in paragraph at lines 22--24
 
  []
 
-[4]) (Chapters/AnalisiComplessita.tex [5]
+[4 <./Images/Chapters/Esempio_Fail.png>]
+<./Images/Chapters/Esempio_Ciclo.png, id=121, 594.72188pt x 359.09157pt>
+File: ./Images/Chapters/Esempio_Ciclo.png Graphic file (type png)
+<use ./Images/Chapters/Esempio_Ciclo.png>
+Package pdftex.def Info: ./Images/Chapters/Esempio_Ciclo.png  used on input lin
+e 42.
+(pdftex.def)             Requested size: 356.83588pt x 215.45659pt.
+
+Overfull \hbox (11.83588pt too wide) in paragraph at lines 42--43
+ [][] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+) (Chapters/AnalisiComplessita.tex [5] [6 <./Images/Chapters/Esempio_Ciclo.png>
+]
  3.
-) (Chapters/AnalisiSperimentale.tex [6
+) (Chapters/AnalisiSperimentale.tex [7
 
 ]
  4.
-) (Chapters/Conclusioni.tex [7
+) (Chapters/Conclusioni.tex [8
 
 ]
  5.
-) (Chapters/Bibliografia.tex [8
+) (Chapters/Bibliografia.tex [9
 
 ]
 LaTeX Font Info:    Try loading font information for T1+cmtt on input line 2.
@@ -1024,7 +1043,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 2--3
 
 )
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 161.
- [9
+ [10
 
 ]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 161.
@@ -1035,17 +1054,17 @@ Package rerunfilecheck Info: File `KMP_algorithm.out' has not changed.
 (rerunfilecheck)             Checksum: C18874375FA020A7B46B3E35D562A48D;788.
 
 
-LaTeX Warning: There were undefined references.
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 23618 strings out of 492970
- 423237 string characters out of 3143798
- 602297 words of memory out of 3000000
- 27189 multiletter control sequences out of 15000+200000
+ 23635 strings out of 492970
+ 423692 string characters out of 3143798
+ 603297 words of memory out of 3000000
+ 27200 multiletter control sequences out of 15000+200000
  553906 words of font info for 71 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 44i,12n,63p,804b,938s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 44i,12n,63p,804b,801s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\Raffaele_DNDM\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec
 \dpi600\ectt0900.pk> <C:\Users\Raffaele_DNDM\AppData\Local\MiKTeX\2.9\fonts\pk\
 ljfour\jknappen\ec\dpi600\tcrm1000.pk> <C:\Users\Raffaele_DNDM\AppData\Local\Mi
@@ -1071,9 +1090,9 @@ lic/amsfonts/cm/cmex10.pfb><D:/MikTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 lic/amsfonts/cm/cmr10.pfb><D:/MikTex/fonts/type1/public/amsfonts/cm/cmr7.pfb><D
 :/MikTex/fonts/type1/public/amsfonts/cm/cmsy10.pfb><D:/MikTex/fonts/type1/publi
 c/amsfonts/cm/cmsy7.pfb>
-Output written on KMP_algorithm.pdf (11 pages, 237854 bytes).
+Output written on KMP_algorithm.pdf (12 pages, 279605 bytes).
 PDF statistics:
- 561 PDF objects out of 1000 (max. 8388607)
- 33 named destinations out of 1000 (max. 500000)
- 94 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 585 PDF objects out of 1000 (max. 8388607)
+ 36 named destinations out of 1000 (max. 500000)
+ 104 words of extra memory for PDF output out of 10000 (max. 10000000)
 

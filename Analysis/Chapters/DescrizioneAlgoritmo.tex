@@ -5,15 +5,13 @@ L'algoritmo utilizzato divide il testo in sezioni e ne assegna una ad ogni proce
 L'algoritmo KMP esegue pattern-matching in tempo lineare rispetto alla sola dimensione del testo. 
 Sfrutta i risultati ottenuti in precedenza per evitare di dover effettuare nuovamente confronti su caratteri già analizzati. Per rispettare queste prestazioni viene eseguita inizialmente una fase di pre-processamento del pattern, utilizzata per evitare di dover compiere maggiori confronti come nel procedimento naive\cite{func}.\\ Per comprendere in che modo venga effettuata questa fase, è conveniente introdurre i concetti di prefisso e suffisso di una stringa.
 Con il termine {\itshape prefisso} di lunghezza $k$  di una stringa si intendono i primi $k$ caratteri che la compongono, mentre con {\itshape suffisso} di lunghezza $k$ gli ultimi $k$.
-Per ogni prefisso del pattern, viene ricercato il suo prefisso di lunghezza maggiore, che ne costituisca anche un suffisso. Il pre-processamento restituisce un vettore di numeri interi della stessa lunghezza del pattern, chiamato vettore di fallimento o fail vector. Questo contiene, in ogni cella di indice $j$, la lunghezza del prefisso ricercato, come specificato in precedenza, nella sottostringa del pattern (che si estende dal primo carattere al $j$-esimo) (Figura \ref{Esempio_fail}). In questo modo, accedendo ai valori salvati nel vettore, nel caso in cui si verifichi un mismatch, si potrà sapere quali caratteri confrontare successivamente all'interno del testo e del pattern.\\
-\begin{comment}
+Per ogni prefisso del pattern, viene ricercato il suo prefisso di lunghezza maggiore, che ne costituisca anche un suffisso. Il pre-processamento restituisce un vettore di numeri interi della stessa lunghezza del pattern, chiamato vettore di fallimento o fail vector. Questo contiene, in ogni cella di indice $j$, la lunghezza del prefisso ricercato, come specificato in precedenza, nella sottostringa del pattern (che si estende dal primo carattere al $j$-esimo) (Figura \ref{esempio_fail}). In questo modo, accedendo ai valori salvati nel vettore, nel caso in cui si verifichi un mismatch, si potrà sapere quali caratteri confrontare successivamente all'interno del testo e del pattern.
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.5, angle=0]{Path}
-\caption{\footnotesize{}}
-\label{Esempio_fail}
+\includegraphics[scale=0.6, angle=0]{./Images/Chapters/Esempio_Fail}
+\caption{\footnotesize{Esempio di computazione del fail vector per il pattern "abacab".}}
+\label{esempio_fail}
 \end{figure}
-\end{comment}
 Una volta terminata la computazione del vettore, l'algoritmo inizia a confrontare gli elementi del testo con quelli che formano il pattern cercato. Nel caso in cui si verifichi un mismatch tra l'elemento $i$-esimo del testo e il $j$-esimo del pattern, il successivo confronto avviene tra l'elemento $t$-esimo del testo e l'elemento $k$-esimo del pattern. Gli indici $t$ e $k$  vengono calcolati con la seguente regola: 
 $$
 \bigg\{
@@ -32,30 +30,19 @@ Sfruttando più processori è possibile effettuare la ricerca del pattern in pi�
 Calcola il fail vector applicando al pattern di partenza la funzione di fallimento
 }
 \item{\textbf{Elaborazione del testo}
-Legge in input il nome del file in cui cercare il pattern e si occupa di aprire lo stream verso di esso. Legge il contenuto del testo ed in seguito chiude lo stream verso di esso.
+Legge in input il nome del file in cui cercare il pattern e si occupa di aprire lo stream verso di esso. Legge il contenuto del testo ed in seguito chiude lo stream verso di esso. Elabora le stringhe necessarie agli altri processori per applicare il KMP attraverso due fasi (Figura \ref{esempio_ciclo}):
 \begin{itemize}
 \item{\textbf{Ciclo 1}\\
 Una volta salvato l'intero testo all'interno di una stringa, rimuove $m-1$ elementi da essa ( $m$ = lunghezza del pattern) e la divide in un numero di sezioni pari al numero di processi disponibili.\\Se la stringa risultante dalla rimozione degli ultimi caratteri non dovesse essere un multiplo del numero di processori utilizzati, viene svolta una ripartizione intera della stringa e gli elementi non inclusi vengono inviati al processore di $rank=numero_processori-1$. La cosa più importante è che le stringhe debbano essere inviate rispettando l'ordine crescente dei rank e associandole in questo modo ai vari processori.
-\begin{comment}
-\begin{figure}[h]
-\centering
-\includegraphics[scale=0.5, angle=0]{Path}
-\caption{\footnotesize{}}
-\label{Esempio_Ciclo1}
-\end{figure}
-\end{comment}
-
 }
 \item{\textbf{Ciclo 2}\\
 Nel caso in cui siano presenti occorrenze del pattern a cavallo tra due sezioni del testo, calcolate nel \textbf{Ciclo 1}, non verranno rilevate. Per risolvere tale problema, il processore $0$, elabora anche le sottostringhe necessarie a ciascun processore per verificare la presenza di possibili occorrenze in quelle zone.\\Le sequenze elaborate in questa fase sono costituite dagli ultimi $m-1$ caratteri di una sezione del \textbf{Ciclo 1} e i successivi $m-1$ caratteri. Da questa elaborazione del testo, si può evincere la nostra scelta di escludere alcuni caratteri nel primo ciclo.
-\begin{comment}
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.5, angle=0]{Path}
-\caption{\footnotesize{}}
-\label{Esempio_Ciclo2}
+\includegraphics[scale=0.6, angle=0]{./Images/Chapters/Esempio_Ciclo}
+\caption{\footnotesize{Esempio di computazione delle sequenze dei Cicli 1  e 2, utilizzando 4 processori.}}
+\label{esempio_ciclo}
 \end{figure}
-\end{comment}
 }
 \end{itemize}
 }
