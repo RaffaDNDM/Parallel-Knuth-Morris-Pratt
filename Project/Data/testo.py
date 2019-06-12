@@ -16,7 +16,7 @@ def random_text1(length, pattern, cores):
     size_rank = (length-m+1)//cores
     list_index = [random.randint(i*size_rank,((i+1)*size_rank)-m) for i in range(cores)]
     letters = string.ascii_letters
-    print(list_index)
+    print("testo_random1.txt "+str(list_index))
 
     i=0
     j=0
@@ -27,20 +27,21 @@ def random_text1(length, pattern, cores):
         final_text2 = ""
         final_text3 = ""
 
-        print("index1 :"+str(i))
+        #print("index1 :"+str(i))
         if(i<list_index[j]):
-            final_text1=''.join(random.choice(letters) for k in range(list_index[j]))
-            i=i+list_index[j]
-            print("index2 :"+str(i))
+            final_text1=''.join(random.choice(letters) for k in range(i, list_index[j]))
+            i=list_index[j]
+            #i=i+list_index[j]
+            #print("index2 :"+str(i))
 
         if(i==list_index[j]):
             final_text2=pattern
             i=i+m
-            print("index3 :"+str(i))
+            #print("index3 :"+str(i))
 
         if(j==(cores-1) and list_index[cores-1]<i and i<length):
             final_text3=''.join(random.choice(letters) for k in range(length-i))
-            print("index4 :"+str(i))
+            #print("index4 :"+str(i))
 
         j=j+1
         final_text=final_text+final_text1+final_text2+final_text3
@@ -55,7 +56,7 @@ def random_text2(length, pattern, cores):
     size_rank = (length-m+1)//cores
     list_index = [random.randint(((i+1)*size_rank)-m+1,(((i+1)*size_rank)-1)) for i in range(cores)]
     letters = string.ascii_letters
-    print(list_index)
+    print("testo_random2.txt "+str(list_index))
 
     i=0
     j=0
@@ -67,8 +68,9 @@ def random_text2(length, pattern, cores):
         final_text3 = ""
 
         if(i<list_index[j]):
-            final_text1=''.join(random.choice(letters) for k in range(list_index[j]))
-            i=i+list_index[j]
+            final_text1=''.join(random.choice(letters) for k in range(i, list_index[j]))
+            i=list_index[j]
+            #i=i+list_index[j]
 
         if(i==list_index[j]):
             final_text2=pattern
@@ -92,27 +94,32 @@ def random_text12(length, pattern, cores):
     size_rank = (length-m+1)//cores
     list_index = [random_num(i, m, size_rank) for i in range(2*cores)]
     letters = string.ascii_letters
-    print(list_index)
+    print("testo_random12.txt "+str(list_index))
 
     i=0
     j=0
     final_text = ""
 
-    while(j < cores):
+    while(j < 2*cores):
         final_text1 = ""
         final_text2 = ""
         final_text3 = ""
 
+        #print("index1 :"+str(i))
         if(i<list_index[j]):
-            final_text1=''.join(random.choice(letters) for k in range(list_index[j]))
-            i=i+list_index[j]
+            final_text1=''.join(random.choice(letters) for k in range(i, list_index[j]))
+            #i=i+list_index[j]
+            i=list_index[j]
+            #print("index2 :"+str(i))
 
         if(i==list_index[j]):
             final_text2=pattern
             i=i+m
+            #print("index3 :"+str(i))
 
-        if(j==(cores-1) and list_index[cores-1]<i and i<length):
+        if(j==2*cores-1 and list_index[2*cores-1]<i and i<length):
             final_text3=''.join(random.choice(letters) for k in range(length-i))
+            #print("index4 :"+str(i))
 
         j=j+1
         final_text=final_text+final_text1+final_text2+final_text3
@@ -142,25 +149,25 @@ pattern = "ciao"
 #pattern = "AcnjdsDAbABBACDaDCV"
 
 text=random_text_no(length)
-print(text.count(pattern))
-file = open("testo_random1024.txt", "w")
+print("count "+str(text.count(pattern))+"\n\n")
+file = open("./Power_Seven/testo_random.txt", "w")
 file.write(text)
 file.close()
 
 text=random_text1(length, pattern, cores)
-print(text.count(pattern))
-file = open("testo_random1.txt", "w")
+print("count "+str(text.count(pattern))+"\n\n")
+file = open("./Power_Seven/testo_random1.txt", "w")
 file.write(text)
 file.close()
 
 text=random_text2(length, pattern, cores)
-print(text.count(pattern))
-file = open("testo_random1.txt", "w")
+print("count "+str(text.count(pattern))+"\n\n")
+file = open("./Power_Seven/testo_random2.txt", "w")
 file.write(text)
 file.close()
 
 text=random_text12(length, pattern, cores)
-print(text.count(pattern))
-file = open("testo_random1.txt", "w")
+print("count "+str(text.count(pattern))+"\n\n")
+file = open("./Power_Seven/testo_random12.txt", "w")
 file.write(text)
 file.close()

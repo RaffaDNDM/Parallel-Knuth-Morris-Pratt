@@ -1,0 +1,15 @@
+count 0
+
+
+testo_random1.txt [127, 477, 529, 926]
+count 4
+
+
+testo_random2.txt [252, 508, 764, 1018]
+count 4
+
+
+testo_random12.txt [163, 254, 304, 508, 653, 764, 924, 1018]
+count 8
+
+
