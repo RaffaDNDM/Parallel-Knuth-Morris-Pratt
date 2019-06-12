@@ -34,7 +34,7 @@ def random_text1(length, pattern, cores):
             print("index2 :"+str(i))
 
         if(i==list_index[j]):
-            final_text2=''.join(pattern[k] for k in range(m))
+            final_text2=pattern
             i=i+m
             print("index3 :"+str(i))
 
@@ -71,7 +71,7 @@ def random_text2(length, pattern, cores):
             i=i+list_index[j]
 
         if(i==list_index[j]):
-            final_text2=''.join(pattern[k] for k in range(m))
+            final_text2=pattern
             i=i+m
 
         if(j==(cores-1) and list_index[cores-1]<i and i<length):
@@ -108,7 +108,7 @@ def random_text12(length, pattern, cores):
             i=i+list_index[j]
 
         if(i==list_index[j]):
-            final_text2=''.join(pattern[k] for k in range(m))
+            final_text2=pattern
             i=i+m
 
         if(j==(cores-1) and list_index[cores-1]<i and i<length):
