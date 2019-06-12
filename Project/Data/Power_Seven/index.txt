@@ -1,15 +1,16 @@
+AbbeAACbEeedarIdarOh
 count 0
 
 
-testo_random1.txt [127, 477, 529, 926]
+testo_random1.txt [9, 384, 563, 844]
 count 4
 
 
-testo_random2.txt [252, 508, 764, 1018]
+testo_random2.txt [250, 491, 743, 994]
 count 4
 
 
-testo_random12.txt [163, 254, 304, 508, 653, 764, 924, 1018]
+testo_random12.txt [204, 247, 344, 494, 607, 745, 852, 993]
 count 8
 
 
