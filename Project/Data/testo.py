@@ -14,27 +14,28 @@ file1.write(random_text(length))
 def random_text(length, pattern, cores, list_index):
     letters = string.ascii_letters
 
-    final_text=''
-
     i=0
     j=0
+    final_text = ""
+
     while(j < cores):
-        k=0
+        final_text1 = ""
+        final_text2 = ""
+        final_text3 = ""
 
-        while(i<list_index[j]):
-            final_text.join(random.choice(letters))
-            i=i+1
+        if(i<list_index[j]):
+            final_text1=''.join(random.choice(letters) for k in range(list_index[j]))
+            i=i+list_index[j]
 
-        while(i<list_index[j]+m):
-            final_text.join(pattern[k])
-            i=i+1
-            k=k+1
+        if(i==list_index[j]):
+            final_text2=''.join(pattern[k] for k in range(m))
+            i=i+m
 
-        while(j==(cores-1) and list_index[cores-1]<i and i<length):
-            final_text.join(random.choice(letters))
-            i=i+1
+        if(j==(cores-1) and list_index[cores-1]<i and i<length):
+            final_text3=''.join(random.choice(letters) for k in range(length-i))
 
         j=j+1
+        final_text=final_text+final_text1+final_text2+final_text3
 
     return final_text
 
@@ -53,6 +54,7 @@ print(list_index)
 
 text=random_text(length, pattern, cores, list_index)
 print(text)
+print(len(text))
 file1 = open("testo_random1.txt", "w")
-#file1.write()
+file1.write()
 file1.close()
