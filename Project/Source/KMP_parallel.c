@@ -88,7 +88,7 @@ int main (int argc, char **argv)
         {
             if(i==size_text)
             {
-                size_text=size_text*2;
+                size_text=size_text<<1;
                 text=realloc(text, sizeof(char)*size_text);
             }
 
@@ -117,7 +117,7 @@ int main (int argc, char **argv)
 
         int begin_r=-1;//variabile che contiene l'indice del primo carattere da leggere (inizializzata ad un valore non valido)
         int begin_w=-1;//variabile che contiene l'indice della posizione in cui scirvere il primo carattere (inizializzata ad un valore non valido)
-        size_cycle2=size*((2*(m-1)))+1;//numero di caratteri che ogni processo andrà ad analizzare al secondo ciclo
+        size_cycle2=size*((m-1)<<1)+1;//numero di caratteri che ogni processo andrà ad analizzare al secondo ciclo
         text2=malloc(sizeof(char)*size_cycle2);
 
         for (i=0; i<size-1; i++)
@@ -128,21 +128,21 @@ int main (int argc, char **argv)
             indices[i]=begin_r;//memorizzazione degli indici del primo carattere passato successivamente ai processori per il secondo ciclo
 
             //acquisizione del testo necessario per il secondo ciclo
-			begin_w=i*2*(m-1);
-            for(;j<2*(m-1);j++)
+			begin_w=(i*(m-1))<<1;
+            for(;j<(m-1)<<1;j++)
             {
                 text2[begin_w+j]=text[begin_r+j];
             }
         }
 
         //acquisizione degli ultimi caratteri del testo necessari per il secondo ciclo
-        begin_r=size_text-(2*(m-1));
+        begin_r=size_text-((m-1)<<1);
 		indices[size-1]=begin_r;
 
-		begin_w=i*(2*(m-1));
+		begin_w=i*((m-1)<<1);
 		int j=0;
 
-        for (; j<2*(m-1); j++)
+        for (; j<(m-1)<<1; j++)
         {
             text2[begin_w+j]=text[begin_r+j];
         }
@@ -165,7 +165,7 @@ int main (int argc, char **argv)
     }
 
 	char *rcv_buff=malloc(sizeof(char)*(rcv_size+1));
-    char *rcv_buff2=malloc(sizeof(char)*((2*m)-1));
+    char *rcv_buff2=malloc(sizeof(char)*((m<<1)-1));
     MPI_Barrier(MPI_COMM_WORLD);
 
     //passaggio di rank_size caratteri a ciascun processore (verranno analizzati al primo ciclo)
@@ -191,7 +191,7 @@ int main (int argc, char **argv)
     MPI_Barrier(MPI_COMM_WORLD);
 
     //passaggio a tutti i processi dei caratteri da analizzare al secondo ciclo
-    MPI_Scatter(text2, 2*(m-1), MPI_CHAR, rcv_buff2, 2*(m-1), MPI_CHAR, 0, MPI_COMM_WORLD);
+    MPI_Scatter(text2, (m-1)<<1, MPI_CHAR, rcv_buff2,(m-1)<<1, MPI_CHAR, 0, MPI_COMM_WORLD);
 
 
 	//passaggio dell'indice trovare il primo carattere del secondo ciclo nel testo complessivo
