@@ -141,11 +141,11 @@ def random_num(iter, m, size_rank):
         return random.randint(((i+1)*size_rank)-m+1,(((i+1)*size_rank)-1))
 
 #cores=8
-#cores=32
-cores=4
-#length = 1073741824
+cores=32
+#cores=4
+length = 1073741824
 #length=268435456
-length = 1024
+#length = 1024
 file = open("./Power_Seven/pattern.txt", "r")
 pattern = file.read()
 pattern = pattern[:-1] #tolgo l'a capo a fine riga
