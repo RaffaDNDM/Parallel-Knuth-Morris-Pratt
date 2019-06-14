@@ -16,7 +16,7 @@
     @param m lunghezza del pattern
     @param fail array precalcolato fail
 */
-int findKMP(const char *text, const char *pattern, int m, const int *fail);
+int findKMP(const char *text, const char *pattern, const int m, const int *fail);
 
 /**
     @details Funzione che computa l'array fail
@@ -24,6 +24,6 @@ int findKMP(const char *text, const char *pattern, int m, const int *fail);
     @param m lunghezza del pattern
     @param fail array fail da inizializzare
 */
-void computeFailKMP(char * pattern, int m, int *fail);
+void computeFailKMP(const char * pattern, const int m, int *fail);
 
 #endif

@@ -8,7 +8,7 @@
 #include <string.h>
 #include "KMP.h"
 
-int findKMP(const char *text, const char *pattern, int m, const int *fail)
+int findKMP(const char *text, const char *pattern, const int m, const int *fail)
 {
   int n = strlen(text);//lunghezza del testo
   int j=0; //indice che scandisce il testo
@@ -32,13 +32,13 @@ int findKMP(const char *text, const char *pattern, int m, const int *fail)
     }
     else //se sono all'inizio del pattern e non ho corrispondenza
       {
-        j++;
+        j=j+1;
       }
   }
   return -1;//non ha trovato occorrenze
 }
 
-void computeFailKMP(char * pattern, int m, int *fail)
+void computeFailKMP(const char * pattern, const int m, int *fail)
 {
    int j=1;//indice che scandisce fail
    int k=0;//indice che scandisce il pattern
