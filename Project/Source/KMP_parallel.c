@@ -281,9 +281,15 @@ int main (int argc, char **argv)
     {
         free(text2);
         free(text);
+<<<<<<< HEAD
 		    //Chiusura dell'applicazione
 		    printf("Premere un tasto qualsiasi per uscire\n");
 		    getchar();
+=======
+		//Chiusura dell'applicazione
+		printf("Premere un tasto qualsiasi per uscire\n");
+		getchar();
+>>>>>>> 9fdb99b763920bbcdae472066faf45137a650875
     }
 
     //Termine di MPI
