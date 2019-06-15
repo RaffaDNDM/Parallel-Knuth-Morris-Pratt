@@ -26,6 +26,7 @@ void our_min(const int *invector, int *outvalue, const int *size, const MPI_Data
 
 int main (int argc, char **argv)
 {
+    //Inizializzazione di MPI
     MPI_Init(&argc, &argv);
 
     //rank di ogni processore e numero di processori
@@ -35,30 +36,31 @@ int main (int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD,&size);
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
-    //inizializzazione del buffer contenente l'intero testo
-    int *size_buff;
+    //inizializzazione della dimensione del testo
     int size_text=SIZE;
 
-    //grandezza delle stringhe analizzate da ciscun processore
-    //nel secondo ciclo dell'algoritmo KMP parallelo
+    //stringhe che contengono rispettivamente l'intero testo, l'insieme
+    //di tutte stringhe usate poi nel secondo ciclo e il pattern
+    char *text,*text2, *pattern= argv[2];
+
+    //grandezza complessiva del testo formato da tutte le stringhe analizzate
+    //dai processori nel secondo ciclo dell'algoritmo KMP parallelo (= strlen(text2))
     int size_cycle2;
 
-    //stringhe che contengono rispettivamente l'intero testo, l'insieme
-    //delle stringhe usate poi nel secondo ciclo e il pattern
-    char *text,*text2, *pattern= argv[2];
     //lunghezza del pattern
     int m = strlen(pattern);
 
-    //failure function che verrà calcolata dal processore 0
-    //per tutti gli altri e poi condivisa con loro
+    //failure vector che verrà calcolato dal processore 0
+    //una volta per tutte e poi condivisa con gli altri processori
     int *fail;
     fail=malloc(sizeof(int)*m);
 
-    //array di tutti gli indici dei primi caratteri di
-    //tutte le stringhe passate ai processori nel secondo ciclo
+    //array contenente gli indici (all'interno del testo originale) del primo
+    //carattere di tutte le stringhe passate ai processori nel secondo ciclo
     int *indices = malloc(sizeof(int)*size);
 
-    //variabili utilizzate per definire poi la grandezza del buffer finale
+    //interi utilizzati per definire la grandezza della stringa
+    //letta da ciascun processore nel primo ciclo dell'algoritmo
     int rank_size=0, last_extra=0;
 
     //*************************** RANK 0 ********************************
@@ -81,14 +83,12 @@ int main (int argc, char **argv)
 
         while(check!=0)
         {
-
             if(i==size_text)
             {
                 size_text=size_text<<1;
                 text=realloc(text, sizeof(char)*size_text);
             }
 
-            //text[i]=fgetc(fp);
             check=read(fp, &(text[i]), 1);
             i=i+1;
         }
@@ -100,7 +100,15 @@ int main (int argc, char **argv)
         //Chiusura del file aperto in lettura
         close(fp);
 
-        //allocazione dello spazio per l'array fail e sua computazione, m=lunghezza del pattern
+        /*
+        if(size_text<m)
+        {
+            printf("Il pattern non è presente all'interno del testo\n");
+            return 0;
+        }
+        */
+
+        //inizializzazione del fail vector e sua computazione
         i=0;
         for(;i<m;i++)
         {
@@ -108,14 +116,21 @@ int main (int argc, char **argv)
         }
         computeFailKMP(pattern, m, fail);
 
+        //lunghezza della stringa divisa tra i vari processori nel primo ciclo (testo - ultimi (m-1) caratteri)
         int true_size=size_text-m+1;
-        rank_size=true_size/size;//numero di caratteri che ogni processo andrà ad analizzare (ad esclusione dell'ultimo)
-        last_extra=true_size%size;//numero di caratteri da aggiungere a quelli che analizza l'ultimo processo
-
-        int begin_r=-1;//variabile che contiene l'indice del primo carattere da leggere (inizializzata ad un valore non valido)
-        int begin_w=-1;//variabile che contiene l'indice della posizione in cui scirvere il primo carattere (inizializzata ad un valore non valido)
+        //numero di caratteri che ogni processo andrà ad analizzare (ad esclusione dell'ultimo)
+        rank_size=true_size/size;
+        //numero di caratteri da aggiungere a quelli che analizza l'ultimo processo
+        last_extra=true_size%size;
+        //indice del primo carattere da leggere (inizializzata ad un valore non valido)
+        int begin_r=-1;
+        //indice della posizione in cui scirvere il primo carattere (inizializzata ad un valore non valido)
+        int begin_w=-1;
+        //lunghezza di una stringa che verrà passata a un processore nel secondo ciclo
         int length_string2=(m-1)<<1;
-        size_cycle2=size*(length_string2)+1;//numero di caratteri che ogni processo andrà ad analizzare al secondo ciclo
+        //numero di caratteri che ogni processo andrà ad analizzare al secondo ciclo
+        size_cycle2=size*(length_string2)+1;
+
         text2=malloc(sizeof(char)*size_cycle2);
 
         for (i=0; i<size-1; i++)
@@ -123,7 +138,8 @@ int main (int argc, char **argv)
             int j=0;
             begin_r=((i+1)*rank_size)-m+1;
 
-            indices[i]=begin_r;//memorizzazione degli indici del primo carattere passato successivamente ai processori per il secondo ciclo
+            //memorizzazione degli indici del primo carattere passato successivamente ai processori per il secondo ciclo
+            indices[i]=begin_r;
 
             //acquisizione del testo necessario per il secondo ciclo
             begin_w=i*length_string2;
@@ -135,10 +151,10 @@ int main (int argc, char **argv)
 
         //acquisizione degli ultimi caratteri del testo necessari per il secondo ciclo
         begin_r=size_text-length_string2;
-		indices[size-1]=begin_r;
+		    indices[size-1]=begin_r;
 
-		begin_w=i*length_string2;
-		int j=0;
+		    begin_w=i*length_string2;
+		    int j=0;
 
         for (; j<length_string2; j++)
         {
@@ -156,26 +172,29 @@ int main (int argc, char **argv)
     MPI_Bcast(&rank_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
+    //dichiarazione della grandezza della stringa che verrà passata a ciascun processore nel primo ciclo
     int rcv_size=rank_size;
     MPI_Status stat;
     if (rank==size-1)
     {
-        //ricezione da parte dell'ultimo processo del numero di caratteri da aggiungere rispetto agli altri processi
+        //ricezione dell'ultimo processo del numero di caratteri in più da leggere rispetto agli altri processi
         MPI_Recv(&last_extra, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &stat);
         rcv_size=rcv_size+last_extra;
     }
 
-	char *rcv_buff=malloc(sizeof(char)*(rcv_size+1));
+    //stringa analizzata da ciascun processo al primo ciclo
+    char *rcv_buff=malloc(sizeof(char)*(rcv_size+1));
+
+    //stringa analizzata da ciascun processo al secondo ciclo
     char *rcv_buff2=malloc(sizeof(char)*((m<<1)-1));
     MPI_Barrier(MPI_COMM_WORLD);
 
     //passaggio di rank_size caratteri a ciascun processore (verranno analizzati al primo ciclo)
     MPI_Scatter(text, rank_size, MPI_CHAR, rcv_buff, rank_size, MPI_CHAR, 0, MPI_COMM_WORLD);
-	MPI_Barrier(MPI_COMM_WORLD);
+	  MPI_Barrier(MPI_COMM_WORLD);
 
-
-    //passaggio del resto di caratteri all'ultimo processore (last_extra)
-    //(nel caso in cui il numero di caratteri del testo non sia multiplo del numero dei processori)
+    //passaggio dei restanti caratteri necessari all'ultimo processore (last_extra)
+    //per definire la stringa che analizzerà nel primo ciclo
     if(rank==0)
     {
         //dati MPI usata per la comunicazione punto a punto successiva
@@ -189,20 +208,20 @@ int main (int argc, char **argv)
     }
 	  rcv_buff[rcv_size] = 0;
 
-    //passaggio dell'array fail a tutti i processi
+    //comunicazione dell'array fail a tutti i processi
     MPI_Bcast(fail, m, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    //passaggio a tutti i processi dei caratteri da analizzare al secondo ciclo
+    //comunicazione a tutti i processi delle stringhe da analizzare nel secondo ciclo
     MPI_Scatter(text2, (m-1)<<1, MPI_CHAR, rcv_buff2,(m-1)<<1, MPI_CHAR, 0, MPI_COMM_WORLD);
 
-    //indice del primo carattere della stringa passata
-    //al processore nel secondo ciclo dell'algoritmo
+    //indice del primo carattere della stringa, passata al processore
+    //nel secondo ciclo dell'algoritmo, rispetto al testo originale
     int index=-1;
 
-	//passaggio dell'indice trovare il primo carattere del secondo ciclo nel testo complessivo
+	  //passaggio dell'indice trovare il primo carattere del secondo ciclo nel testo complessivo
     //(necessario per il calcolo dell'indice assoluto di inizio dell'occorenza del pattern)
-	MPI_Scatter(indices, 1, MPI_INT, &index, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Scatter(indices, 1, MPI_INT, &index, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
     //calcolo dell'indice di inizio della prima occorrenza del pattern all'interno del testo
@@ -213,7 +232,7 @@ int main (int argc, char **argv)
         //--------------Ciclo 1------------------------
         partial_result=partial_result+(rank_size*rank);//calcolo dell'indice assoluto
     }
-	else
+	  else
     {
         //--------------Ciclo 2------------------------
 	      partial_result= findKMP(rcv_buff2, pattern, m, fail);
@@ -223,17 +242,19 @@ int main (int argc, char **argv)
         }
 	  }
 
-	  int result = -1;
-
     //creazione della nostra funzione per il calcolo dell'indice minimo tra le occorenze trovate
     MPI_Op operation;
     MPI_Op_create((MPI_User_function *) our_min, 1, &operation);
     MPI_Barrier(MPI_COMM_WORLD);
-    //calcolo dell'indice minimo
+
+    //indice della prima occorrenza del pattern nel testo (-1 se non è presente)
+    int result = -1;
+
+    //comunicazione dell'indice minimo tra quelli valutati da ciascun processore
     MPI_Reduce(&partial_result, &result, 1, MPI_INT, operation, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    //stampa dell'indice trovato (se trovato)
+    //stampa dell'indice trovato
     if(rank==0)
     {
         printf(LINE);
@@ -260,11 +281,12 @@ int main (int argc, char **argv)
     {
         free(text2);
         free(text);
-		//Chiusura dell'applicazione
-		printf("Premere un tasto qualsiasi per uscire\n");
-		getchar();
-	}
+		    //Chiusura dell'applicazione
+		    printf("Premere un tasto qualsiasi per uscire\n");
+		    getchar();
+    }
 
+    //Termine di MPI
     MPI_Finalize();
     return 0;
 }
