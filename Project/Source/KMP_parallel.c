@@ -50,10 +50,10 @@ int main (int argc, char **argv)
     //lunghezza del pattern
     int m = strlen(pattern);
 
-    //failure vector che verrà calcolato dal processore 0
-    //una volta per tutte e poi condivisa con gli altri processori
+    //Allocazione e inizializzazione del failure vector, che verrà calcolato dal processore 0
+    //una volta per tutte e poi condiviso con gli altri processori
     int *fail;
-    fail=malloc(sizeof(int)*m);
+    fail=calloc(m, sizeof(int));
 
     //array contenente gli indici (all'interno del testo originale) del primo
     //carattere di tutte le stringhe passate ai processori nel secondo ciclo
@@ -62,6 +62,9 @@ int main (int argc, char **argv)
     //interi utilizzati per definire la grandezza della stringa
     //letta da ciascun processore nel primo ciclo dell'algoritmo
     int rank_size=0, last_extra=0;
+
+    //lunghezza di una stringa che verrà passata a un processore nel secondo ciclo
+    int length_string2=(m-1)<<1;
 
     //*************************** RANK 0 ********************************
     if (rank==0)
@@ -100,20 +103,13 @@ int main (int argc, char **argv)
         //Chiusura del file aperto in lettura
         close(fp);
 
-        /*
+        //evitare la computazione dell'algoritmo se i parametri in input non sono logicamente corretti
         if(size_text<m)
         {
             printf("Il pattern non è presente all'interno del testo\n");
             return 0;
         }
-        */
 
-        //inizializzazione del fail vector e sua computazione
-        i=0;
-        for(;i<m;i++)
-        {
-            fail[i]=0;
-        }
         computeFailKMP(pattern, m, fail);
 
         //lunghezza della stringa divisa tra i vari processori nel primo ciclo (testo - ultimi (m-1) caratteri)
@@ -124,39 +120,39 @@ int main (int argc, char **argv)
         last_extra=true_size%size;
         //indice del primo carattere da leggere (inizializzata ad un valore non valido)
         int begin_r=-1;
-        //indice della posizione in cui scirvere il primo carattere (inizializzata ad un valore non valido)
+        //indice della posizione in cui scirvere il primo carattere di una stringa del secondo ciclo(inizializzata ad un valore non valido)
         int begin_w=-1;
-        //lunghezza di una stringa che verrà passata a un processore nel secondo ciclo
-        int length_string2=(m-1)<<1;
         //numero di caratteri che ogni processo andrà ad analizzare al secondo ciclo
         size_cycle2=size*(length_string2)+1;
 
         text2=malloc(sizeof(char)*size_cycle2);
 
-        for (i=0; i<size-1; i++)
+        for(i=size-1; i>0; i--)
         {
-            int j=0;
-            begin_r=((i+1)*rank_size)-m+1;
+            int k=size-1-i;
+            begin_r=((k+1)*rank_size)-m+1;
 
             //memorizzazione degli indici del primo carattere passato successivamente ai processori per il secondo ciclo
-            indices[i]=begin_r;
+            indices[k]=begin_r;
 
             //acquisizione del testo necessario per il secondo ciclo
-            begin_w=i*length_string2;
-            for(;j<length_string2;j++)
+            begin_w=k*length_string2;
+
+            int j;
+            for(j=length_string2; j--; )
             {
                 text2[begin_w+j]=text[begin_r+j];
             }
         }
 
         //acquisizione degli ultimi caratteri del testo necessari per il secondo ciclo
-        begin_r=size_text-length_string2;
+        begin_r=size_text-length_string2-1;
 		    indices[size-1]=begin_r;
 
-		    begin_w=i*length_string2;
+		    begin_w=(size-1)*length_string2;
 		    int j=0;
 
-        for (; j<length_string2; j++)
+        for(j=length_string2; j--; )
         {
             text2[begin_w+j]=text[begin_r+j];
         }
@@ -201,8 +197,7 @@ int main (int argc, char **argv)
         MPI_Request req;
         MPI_Isend(&text[size*rank_size], last_extra, MPI_CHAR, size-1, 1, MPI_COMM_WORLD, &req);
     }
-
-    if(rank==size-1)//METTERE UN IF ELSE?
+    else if(rank==size-1)
     {
         MPI_Recv(&rcv_buff[rank_size], last_extra, MPI_CHAR, 0, 1, MPI_COMM_WORLD, &stat);
     }
@@ -213,7 +208,7 @@ int main (int argc, char **argv)
     MPI_Barrier(MPI_COMM_WORLD);
 
     //comunicazione a tutti i processi delle stringhe da analizzare nel secondo ciclo
-    MPI_Scatter(text2, (m-1)<<1, MPI_CHAR, rcv_buff2,(m-1)<<1, MPI_CHAR, 0, MPI_COMM_WORLD);
+    MPI_Scatter(text2, length_string2, MPI_CHAR, rcv_buff2, length_string2, MPI_CHAR, 0, MPI_COMM_WORLD);
 
     //indice del primo carattere della stringa, passata al processore
     //nel secondo ciclo dell'algoritmo, rispetto al testo originale
@@ -224,21 +219,29 @@ int main (int argc, char **argv)
     MPI_Scatter(indices, 1, MPI_INT, &index, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    //calcolo dell'indice di inizio della prima occorrenza del pattern all'interno del testo
-    //utilizzando l'algoritmo KMP
+    /*
+    #########################################################
+    #                Algoritmo KMP parallelo                #
+    #########################################################
+    */
+
+    //Calcolo dell'indice della prima occorrenza nella stringa passata al processore nel Ciclo 1
     int partial_result= findKMP(rcv_buff, pattern, m, fail);
     if(partial_result!=-1)
     {
         //--------------Ciclo 1------------------------
-        partial_result=partial_result+(rank_size*rank);//calcolo dell'indice assoluto
+        //Calcolo dell'indice della prima occorrenza del Ciclo 1 all'intero file di testo
+        partial_result=partial_result+(rank_size*rank);
     }
 	  else
     {
         //--------------Ciclo 2------------------------
-	      partial_result= findKMP(rcv_buff2, pattern, m, fail);
+        //Calcolo dell'indice della prima occorrenza nella stringa passata al processore nel Ciclo 2
+        partial_result= findKMP(rcv_buff2, pattern, m, fail);
         if(partial_result!=-1)
         {
-    		    partial_result=partial_result+index;//calcolo dell'indice assoluto
+            //calcolo dell'indice della prima occorrenza del Ciclo 2 all'intero file di testo
+    		    partial_result=partial_result+index;
         }
 	  }
 
@@ -285,12 +288,7 @@ int main (int argc, char **argv)
 		    //Chiusura dell'applicazione
 		    printf("Premere un tasto qualsiasi per uscire\n");
 		    getchar();
-
-		    //Chiusura dell'applicazione
-		    printf("Premere un tasto qualsiasi per uscire\n");
-		    getchar();
-
-    }
+		}
 
     //Termine di MPI
     MPI_Finalize();
