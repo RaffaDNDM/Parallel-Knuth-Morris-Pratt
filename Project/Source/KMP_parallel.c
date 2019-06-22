@@ -288,7 +288,7 @@ int main (int argc, char **argv)
         double time =finish-start;
         printf ("Tempo impiegato per l'esecuzione %f secondi\n", time);
 		    //Chiusura dell'applicazione
-		    //printf("Premere un tasto qualsiasi per uscire\n");
+		    //printf("Premere un tasto qualsiasi per uscire");
 		   // getchar();
     }
 

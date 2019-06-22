@@ -294,7 +294,7 @@ int main (int argc, char **argv)
         printf ("Tempo impiegato per l'esecuzione %f secondi\n", time);
 
 		    //Chiusura dell'applicazione
-		    //printf("Premere un tasto qualsiasi per uscire\n");
+		    //printf("Premere un tasto qualsiasi per uscire");
 		    //getchar();
 		}
 
