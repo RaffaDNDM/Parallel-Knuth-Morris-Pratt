@@ -51,12 +51,12 @@ def random_text1(length, pattern, cores):
 '''
 Insertion of occorrences in only strings of cycle 2
 '''
-def random_text2(length, pattern, cores):
+def random_text2(length, pattern, cores, file):
     m = len(pattern)
     size_rank = (length-m+1)//cores
     list_index = [random.randint(((i+1)*size_rank)-m+1,(((i+1)*size_rank)-1)) for i in range(cores)]
     letters = string.ascii_letters
-    print("testo_random2.txt "+str(list_index))
+    print(file+" "+str(list_index))
 
     i=0
     j=0
@@ -140,39 +140,42 @@ def random_num(iter, m, size_rank):
     else:
         return random.randint(((i+1)*size_rank)-m+1,(((i+1)*size_rank)-1))
 
-#cores=8
+
 cores=32
 #cores=4
 length = 1073741824
-#length=268435456
 #length = 1024
-file = open("./Power_Seven/pattern.txt", "r")
+file = open("pattern.txt", "r")
 pattern = file.read()
 pattern = pattern[:-1] #tolgo l'a capo a fine riga
 print(str(pattern))
 file.close()
 #pattern = "AcnjdsDAbABBACDaDCV"
-
+'''
 text=random_text_no(length)
 print("count "+str(text.count(pattern))+"\n\n")
-file = open("./Power_Seven/testo_random.txt", "w")
+file = open("testo_random.txt", "w")
 file.write(text)
 file.close()
 
 text=random_text1(length, pattern, cores)
 print("count "+str(text.count(pattern))+"\n\n")
-file = open("./Power_Seven/testo_random1.txt", "w")
+file = open("testo_random1.txt", "w")
 file.write(text)
 file.close()
-
-text=random_text2(length, pattern, cores)
-print("count "+str(text.count(pattern))+"\n\n")
-file = open("./Power_Seven/testo_random2.txt", "w")
-file.write(text)
-file.close()
-
+'''
+list_dim=[1024*1024]
+for i in list_dim:
+    file_string="testo_random2_"+str(i)+".txt"
+    text=random_text2(i, pattern, cores, file_string)
+    print("count "+str(text.count(pattern))+"\n\n")
+    file = open(file_string, "w")
+    file.write(text)
+    file.close()
+'''
 text=random_text12(length, pattern, cores)
 print("count "+str(text.count(pattern))+"\n\n")
-file = open("./Power_Seven/testo_random12.txt", "w")
+file = open("testo_random12.txt", "w")
 file.write(text)
 file.close()
+'''
