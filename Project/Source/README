@@ -1,0 +1,10 @@
+Compilare il programma utilizzando il comando:
+
+make
+
+Inserire come ultima riga del job (nella macchina parallela) la seguente istruzione:
+
+./KMP_parallel  file_di_testo  pattern  KMP_parallel
+
+Il pattern può essere modificato in ../Data/testo.py, di default è impostato a "AbbeAACbEeedarIdarOh".
+C'è un esempio di job file, chiamato myjob.job e sviluppato per Power7 con AIX, all'interno di questa cartella.

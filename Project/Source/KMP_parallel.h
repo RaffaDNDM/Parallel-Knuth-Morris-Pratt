@@ -9,7 +9,8 @@
 #ifndef PARALLEL_KMP
 
 #define PARALLEL_KMP
-#define SIZE 60
+#define SIZE 50
+#define MAX_BUFF_SIZE 50*1024*1024
 #define LINE "+----------------------------------------------------------+\n"
 #define OUT_SIZE 58
 #define TITLE "\n \
@@ -19,5 +20,8 @@
 |  ___/ _` | '__/ _` | | |/ _ \\ |   |  < | |\\/| |  ___/ \n \
 | |  | (_| | | | (_| | | |  __/ |   | . \\| |  | | |     \n \
 |_|   \\__,_|_|  \\__,_|_|_|\\___|_|   |_|\\_\\_|  |_|_|     \n\n\n"
+
+int KMP_parallel_function(int* input_text,int n_iteration, MPI_Comm *comm, char *pat, int *finish);
+
 
 #endif

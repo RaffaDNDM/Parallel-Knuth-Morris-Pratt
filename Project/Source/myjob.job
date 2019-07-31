@@ -1,0 +1,15 @@
+#! /bin/bash
+
+#@ job_name   = KMP_parallel_1KB
+#@ initialdir = /home/gruppo4/Project/Source/
+#@ input      = /dev/null
+#@ output     = ../Result/my_output_O3_1MB_1core.txt
+#@ error = ../Result/my_error_O3_1MB_1core.txt
+#@ class = long
+#@ job_type = parallel
+#@ blocking = unlimited
+#@ total_tasks = 1
+#@ queue 
+
+./KMP_parallel_O3_4p_140MB ../Data/testo_last_1MB.txt  AbbeAACbEeedarIdarOh  KMP_parallel_O3_1p_1MB
+	
